@@ -15,6 +15,7 @@ int stop_or_go(char a[N][M], char b[N][M], int n, int m);
 int neighbor_change(char a[N][M], char b[N][M], int n , int m);
 int generate(char a[N][M], int n, int m);
 int generate2(char a[N][M], int n, int m);
+int input(char a[N][M], int n, int m);
 
 int main() {
     char first[N][M], second[N][M];
@@ -22,12 +23,12 @@ int main() {
     char ch;
     generate2(first, N ,M); // generate initial matrix can be deleted
     generate(second, N, M); 
+    //input(second, N, M);
     printf("\033[H\033[J");  
     draw(second, N, M);  // initial draw can be changed
     while(flag) {
         if (stop_or_go(first, second, N , M)) { // checking the condition of the game
             recoder(second, first, N, M); // owerwrite previous step to the previous one
-            // int i = 0;
             do { // control the input symbol
                 scanf("%c", &ch); // input char
                 while ((getchar() != '\n')) {}
@@ -218,4 +219,25 @@ int generate2(char a[N][M], int n, int m) {
         }
     }
     return 1;    
+}
+
+int input(char a[N][M], int n, int m) {
+    int flag = 1;
+    FILE *fp;
+    fp = fopen("out.txt", "r");
+
+    if (fp == NULL) {
+        puts("Open file error");
+        flag = 0;
+    }
+
+    if (flag) {
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < m; j++) {
+                fscanf(fp, "%c", &a[i][j]);
+            }
+        }
+        fclose(fp);        
+    }
+    return flag;
 }
