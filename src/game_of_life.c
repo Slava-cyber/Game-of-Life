@@ -27,8 +27,10 @@ int main() {
     while(flag) {
         if (stop_or_go(first, second, N , M)) { // checking the condition of the game
             recoder(second, first, N, M); // owerwrite previous step to the previous one
+            // int i = 0;
             do { // control the input symbol
                 scanf("%c", &ch); // input char
+                while ((getchar() != '\n')) {}
                 printf("\033[H\033[J"); // clear window
                 draw(second, N, M);  // just draw what we have until necessary symbol
             } while (ch != ' ');
