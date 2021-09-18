@@ -31,3 +31,19 @@ int main() {
     fclose(fp);
     return 0;
 }
+/* код для вставки в generate основной код (изменить константы на @ и " ")
+FILE *fp;
+fp = fopen("out.txt", "r");
+
+if (fp == NULL) {
+    puts("Open file error");
+    return 0;
+}
+
+for(int i = 0; i < n; i++) {
+    for(int j = 0; j < m; j++) {
+        fscanf(fp, "%c", &a[i][j]);
+        }
+}
+
+fclose(fp);
