@@ -11,28 +11,26 @@ int x_neighbor(int x, int step);
 int y_neighbor(int y, int step);
 int draw(char a[N][M], int n, int m);
 int recoder(char a[N][M], char b[N][M], int n, int m);
-int stop_or_go(char a[N][M], char b[N][M], int n, int m);
+int stop_or_go(char a[N][M], char b[N][M], char c[N][M], int n, int m);
 int neighbor_change(char a[N][M], char b[N][M], int n , int m);
 int generate(char a[N][M], int n, int m);
 int input(char a[N][M], int n, int m, int type);
 int finish();
 int template(int start, int finish);
 int start();
-int run(char first[N][M], char second[N][M]);
+int run(char first[N][M], char second[N][M], char third[N][M]);
 int choice(int *type, int *flag);
-int game_of_life(int flag, char a[N][M], char b[N][M]);
+int game_of_life(int flag, char a[N][M], char b[N][M], char c[N][M]);
 
 int main() {
-    char first[N][M], second[N][M];
-    run(first, second);
+    char first[N][M], second[N][M], third[N][M];
+    run(first, second, third);
     return 0;
 }
 
 // checking the condition of the game.
-int stop_or_go(char a[N][M], char b[N][M], int n, int m) {
-    int k = 0;
-    int k1 = 0;
-    int k2 = 0;
+int stop_or_go(char a[N][M], char b[N][M], char c[N][M], int n, int m) {
+    int k = 0, k1 = 0, k2 = 0, k3 = 0, k4 = 0;
     int flag;
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
@@ -45,9 +43,15 @@ int stop_or_go(char a[N][M], char b[N][M], int n, int m) {
             if (*(*(b + i) + j) == *(*(a + i) + j)) {
                 k2++;
             }
+            if (*(*(b + i) + j) == *(*(c + i) + j)) {
+                k3++;
+            }
+            if (*(*(a + i) + j) == empty) {
+                k4++;
+            }
         }
     }
-    if (k == n * m || k1 == n * m || k2 == n * m) {
+    if (k == n * m || k1 == n * m || k2 == n * m || (k3 == n * m && k4 != n * m)) {
         flag = 0;
     } else {
         flag = 1;
@@ -171,8 +175,10 @@ int input(char a[N][M], int n, int m, int type) {
         fp = fopen("parovoz.txt", "r");
     } else if (type == 4) {
         fp = fopen("r_pentomino.txt", "r");
-    } else {
+    } else if (type == 5) {
         fp = fopen("naturmort.txt", "r");
+    } else {
+        fp = fopen("g-over.txt", "r");
     }
     if (fp == NULL) {
         puts("Open file error");
@@ -196,7 +202,7 @@ int input(char a[N][M], int n, int m, int type) {
 
 int choice(int *type, int *flag) {
     char ch;
-    if (scanf("%d%c", type, &ch) == 2 && *type >= 1 && *type <=5 && ch == '\n') {
+    if (scanf("%d%c", type, &ch) == 2 && *type >= 1 && *type <=6 && ch == '\n') {
             *flag = 1;
     } else {
         printf("Wrong file name, this file type doesn't exist");
@@ -205,26 +211,30 @@ int choice(int *type, int *flag) {
     return *flag;
 }
 
-int run(char first[N][M], char second[N][M]) {
+int run(char first[N][M], char second[N][M], char third[N][M]) {
     int type, flag;
     start();
     if (choice(&type, &flag)) {
         generate(first, N, M);  // generate initial matrix can be deleted
         input(second, N, M, type);
+        recoder(second, third, N, M);
         printf("\033[H\033[J");
         draw(second, N, M);  // initial draw can be changed
-        game_of_life(flag, first, second);  // game proccess
+        game_of_life(flag, first, second, third);  // game proccess
     }
     return 0;
 }
 
-int game_of_life(int flag, char a[N][M], char b[N][M]) {
+int game_of_life(int flag, char a[N][M], char b[N][M], char c[N][M]) {
     char ch;
     while (flag) {
-        if (stop_or_go(a, b, N , M)) {  // checking the condition of the game
+        if (stop_or_go(a, b, c, N , M)) {  // checking the condition of the game
             recoder(b, a, N, M);  // owerwrite previous step to the previous one
             do {  // control the input symbol
-                scanf("%c", &ch);  // input char
+                // scanf("%c", &ch);  // input char
+                if ((ch = getchar()) == EOF) {
+                    break;
+                }
                 while ((getchar() != '\n')) {}
                 if (ch == 'q') {
                     break;
