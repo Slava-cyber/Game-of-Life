@@ -5,7 +5,7 @@ int main() {
     char A[m][n];
 
     FILE *fp;
-    fp = fopen("out.txt", "r");
+    fp = fopen("start1.txt", "r");
 
     if (fp == NULL) {
         puts("Open file error");
@@ -47,3 +47,4 @@ for(int i = 0; i < n; i++) {
 }
 
 fclose(fp);
+*/
