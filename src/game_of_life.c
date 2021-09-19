@@ -5,7 +5,6 @@
 const char cell = '*';
 const char empty = '-';
 
-int neighbor(char a[N][M], char b[N][M], int n , int m);
 int neighbor_number(char a[N][M], int x, int y);
 int x_neighbor(int x, int step);
 int y_neighbor(int y, int step);
