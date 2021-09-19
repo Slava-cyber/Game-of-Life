@@ -1,9 +1,9 @@
 #include <stdio.h>
 #define N 25
 #define M 80
+
 const char cell = '*';
 const char empty = '-';
-
 
 int neighbor(char a[N][M], char b[N][M], int n , int m);
 int neighbor_number(char a[N][M], int x, int y);
@@ -18,13 +18,13 @@ int input(char a[N][M], int n, int m, int type);
 int finish();
 int template(int start, int finish);
 int start();
-int run();
+int run(char first[N][M], char second[N][M]);
 int choice(int *type, int *flag);
-int game_of_life(int flag, char a[N][M], char b[N][M], int n, int m);
-
+int game_of_life(int flag, char a[N][M], char b[N][M]);
 
 int main() {
-    run();
+    char first[N][M], second[N][M];
+    run(first, second);
     return 0;
 }
 
@@ -44,7 +44,7 @@ int stop_or_go(char a[N][M], char b[N][M], int n, int m) {
             }
             if (*(*(b + i) + j) == *(*(a + i) + j)) {
                 k2++;
-            }                       
+            }
         }
     }
     if (k == n * m || k1 == n * m || k2 == n * m) {
@@ -61,16 +61,14 @@ int neighbor_change(char a[N][M], char b[N][M], int n , int m) {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
             bufer = neighbor_number(a, j, i);
-            //printf("%ds", bufer); 
             if (bufer == 3) {
                 *(*(b + i) + j) = cell;
             } else if (bufer == 2) {
-                *(*(b + i) + j) = *(*(a + i) + j); 
+                *(*(b + i) + j) = *(*(a + i) + j);
             } else {
                 *(*(b + i) + j) = empty;
             }
         }
-        //printf("\n");
     }
     return 1;
 }
@@ -84,32 +82,32 @@ int neighbor_number(char a[N][M], int x, int y) {
     int k = 0;
     if (*(*(a + y) + right) == cell) {
         k++;
-    }  
+    }
     if (*(*(a + y) + left) == cell) {
         k++;
-    }  
+    }
     if (*(*(a + up) + right) == cell) {
         k++;
-    }  
+    }
     if (*(*(a + up) + left) == cell) {
         k++;
-    }  
+    }
     if (*(*(a + up) + x) == cell) {
         k++;
-    }  
+    }
     if (*(*(a + down) + right) == cell) {
         k++;
-    }  
+    }
     if (*(*(a + down) + left) == cell) {
         k++;
-    }  
+    }
     if (*(*(a + down) + x) == cell) {
         k++;
-    }  
+    }
     return k;
 }
 
-// check x-axis neighbors  
+// check x-axis neighbors
 int x_neighbor(int x, int step) {
     int x_new = x + step;
     if (x_new > 79) {
@@ -120,7 +118,7 @@ int x_neighbor(int x, int step) {
     return x_new;
 }
 
-// check y-axis neighbors 
+// check y-axis neighbors
 int y_neighbor(int y, int step) {
     int y_new = y + step;
     if (y_new > 24) {
@@ -133,7 +131,7 @@ int y_neighbor(int y, int step) {
 
 // just draw matrix
 int draw(char a[N][M], int n, int m) {
-    for (int i = 0; i < n; i++){
+    for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
             printf("%c", *(*(a + i) + j));
         }
@@ -144,21 +142,21 @@ int draw(char a[N][M], int n, int m) {
 
 // overwrite the previous step to the previous one
 int recoder(char a[N][M], char b[N][M], int n, int m) {
-    for (int i = 0; i < n; i++){
+    for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
-            *(*(b + i) + j) = *(*(a + i) + j); 
+            *(*(b + i) + j) = *(*(a + i) + j);
         }
     }
     return 1;
 }
 
 int generate(char a[N][M], int n, int m) {
-    for (int i = 0; i < n; i++){
+    for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
-            *(*(a + i) + j) = empty; 
+            *(*(a + i) + j) = empty;
         }
     }
-    return 1;    
+    return 1;
 }
 
 int input(char a[N][M], int n, int m, int type) {
@@ -167,13 +165,13 @@ int input(char a[N][M], int n, int m, int type) {
     FILE *fp;
     if (type == 1) {
         fp = fopen("gun_grospera.txt", "r");
-    } else if (type == 2){
+    } else if (type == 2) {
         fp = fopen("oscilyator.txt", "r");
     } else if (type == 3) {
         fp = fopen("parovoz.txt", "r");
     } else if (type == 4) {
         fp = fopen("r_pentomino.txt", "r");
-    } else if (type == 5) {
+    } else {
         fp = fopen("naturmort.txt", "r");
     }
     if (fp == NULL) {
@@ -181,8 +179,8 @@ int input(char a[N][M], int n, int m, int type) {
         flag = 0;
     }
     if (flag) {
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < m; j++) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
                 fscanf(fp, "%c", &teamp);
                 if (teamp != '\n') {
                     a[i][j] = teamp;
@@ -191,7 +189,7 @@ int input(char a[N][M], int n, int m, int type) {
                 }
             }
         }
-        fclose(fp);        
+        fclose(fp);
     }
     return flag;
 }
@@ -207,53 +205,50 @@ int choice(int *type, int *flag) {
     return *flag;
 }
 
-
-int run() {
-    char first[N][M], second[N][M];
+int run(char first[N][M], char second[N][M]) {
     int type, flag;
     start();
     if (choice(&type, &flag)) {
-        generate(first, N ,M); // generate initial matrix can be deleted
+        generate(first, N, M);  // generate initial matrix can be deleted
         input(second, N, M, type);
-        printf("\033[H\033[J");  
+        printf("\033[H\033[J");
         draw(second, N, M);  // initial draw can be changed
-        game_of_life(flag, first, second, N, M); // game proccess
+        game_of_life(flag, first, second);  // game proccess
     }
     return 0;
 }
 
-int game_of_life(int flag, char a[N][M], char b[N][M], int n, int m) {
+int game_of_life(int flag, char a[N][M], char b[N][M]) {
     char ch;
-    while(flag) {
-        if (stop_or_go(a, b, N , M)) { // checking the condition of the game
-            recoder(b, a, N, M); // owerwrite previous step to the previous one
-            do { // control the input symbol
-                scanf("%c", &ch); // input char
+    while (flag) {
+        if (stop_or_go(a, b, N , M)) {  // checking the condition of the game
+            recoder(b, a, N, M);  // owerwrite previous step to the previous one
+            do {  // control the input symbol
+                scanf("%c", &ch);  // input char
                 while ((getchar() != '\n')) {}
                 if (ch == 'q') {
                     break;
                 }
-                printf("\033[H\033[J"); // clear window
-                draw(a, N, M);  // just draw what we have until necessary symbol
+                printf("\033[H\033[J");  // clear window
+                draw(a, N, M);   // just draw what we have until necessary symbol
             } while (ch != ' ');
                 if (ch == ' ') {
-                    neighbor_change(a, b, N, M); // changing the matrix
+                    neighbor_change(a, b, N, M);  // changing the matrix
                     printf("\033[H\033[J");
-                    draw(b, N, M);                      
+                    draw(b, N, M);
                 } else {
-                    printf("\033[H\033[J");  
+                    printf("\033[H\033[J");
                     printf("stop_game");
-                    flag = 0; // exit from cycle
+                    flag = 0;  // exit from cycle
                 }
-        } else { // if game is stopped
-            printf("\033[H\033[J");  
+        } else {  // if game is stopped
+            printf("\033[H\033[J");
             finish();
-            flag = 0; // exit from cycle
+            flag = 0;  // exit from cycle
         }
     }
     return 1;
 }
-
 
 int start() {
   template(0, 2);
@@ -306,4 +301,3 @@ int template(int start, int finish) {
   }
   return 1;
 }
-
