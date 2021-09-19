@@ -14,36 +14,17 @@ int recoder(char a[N][M], char b[N][M], int n, int m);
 int stop_or_go(char a[N][M], char b[N][M], int n, int m);
 int neighbor_change(char a[N][M], char b[N][M], int n , int m);
 int generate(char a[N][M], int n, int m);
-int generate2(char a[N][M], int n, int m);
-int input(char a[N][M], int n, int m);
+int input(char a[N][M], int n, int m, int type);
+int finish();
+int template(int start, int finish);
+int start();
+int run();
+int choice(int *type, int *flag);
+int game_of_life(int flag, char a[N][M], char b[N][M], int n, int m);
+
 
 int main() {
-    char first[N][M], second[N][M];
-    int flag = 1;
-    char ch;
-    generate2(first, N ,M); // generate initial matrix can be deleted
-    generate(second, N, M); 
-    //input(second, N, M);
-    printf("\033[H\033[J");  
-    draw(second, N, M);  // initial draw can be changed
-    while(flag) {
-        if (stop_or_go(first, second, N , M)) { // checking the condition of the game
-            recoder(second, first, N, M); // owerwrite previous step to the previous one
-            do { // control the input symbol
-                scanf("%c", &ch); // input char
-                while ((getchar() != '\n')) {}
-                printf("\033[H\033[J"); // clear window
-                draw(second, N, M);  // just draw what we have until necessary symbol
-            } while (ch != ' ');
-                neighbor_change(first, second, N, M); // changing the matrix
-                printf("\033[H\033[J");
-                draw(second, N, M);    
-        } else { // if game is stopped
-            printf("\033[H\033[J");  
-            printf("stop_game");
-            flag = 0; // exit from cycle
-        }
-    }
+    run();
     return 0;
 }
 
@@ -171,73 +152,158 @@ int recoder(char a[N][M], char b[N][M], int n, int m) {
     return 1;
 }
 
-
 int generate(char a[N][M], int n, int m) {
     for (int i = 0; i < n; i++){
         for (int j = 0; j < m; j++) {
             *(*(a + i) + j) = empty; 
         }
     }
-    /*a[5][5] = 1;
-    a[5][6] = 1;
-    a[6][5] = 1;
-    a[6][6] = 1;
-    a[7][5] = 1;*/
-    a[0][1] = cell;
-    a[0][2] = cell;
-    a[0][3] = cell;
-    a[24][2] = cell;
-    a[24][3] = cell;
-       a[0][1] = cell;
-    a[3][2] = cell;
-    a[3][3] = cell;
-    a[4][4] = cell;
-    a[4][3] = cell;   
-    a[4][6] = cell;
-    a[6][5] = cell;
-    a[7][4] = cell;
-    a[8][6] = cell;    
-    a[7][5] = cell;
-    a[2][3] = cell;
-    a[14][12] = cell;
-    a[13][12] = cell;  
-    a[15][13] = cell;
-    a[16][13] = cell;
-    a[17][18] = cell;
-    a[18][19] = cell;    
-    a[23][20] = cell;
-    a[23][34] = cell;
-    a[24][35] = cell;
-    a[24][35] = cell;
     return 1;    
 }
 
-int generate2(char a[N][M], int n, int m) {
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < m; j++) {
-            *(*(a + i) + j) = empty; 
-        }
-    }
-    return 1;    
-}
-
-int input(char a[N][M], int n, int m) {
+int input(char a[N][M], int n, int m, int type) {
     int flag = 1;
+    char teamp;
     FILE *fp;
-    fp = fopen("out.txt", "r");
-
+    if (type == 1) {
+        fp = fopen("gun_grospera.txt", "r");
+    } else if (type == 2){
+        fp = fopen("oscilyator.txt", "r");
+    } else if (type == 3) {
+        fp = fopen("parovoz.txt", "r");
+    } else if (type == 4) {
+        fp = fopen("r_pentomino.txt", "r");
+    } else if (type == 5) {
+        fp = fopen("naturmort.txt", "r");
+    }
     if (fp == NULL) {
         puts("Open file error");
         flag = 0;
     }
-
     if (flag) {
         for(int i = 0; i < n; i++) {
             for(int j = 0; j < m; j++) {
-                fscanf(fp, "%c", &a[i][j]);
+                fscanf(fp, "%c", &teamp);
+                if (teamp != '\n') {
+                    a[i][j] = teamp;
+                } else {
+                    j--;
+                }
             }
         }
         fclose(fp);        
     }
     return flag;
 }
+
+int choice(int *type, int *flag) {
+    char ch;
+    if (scanf("%d%c", type, &ch) == 2 && *type >= 1 && *type <=5 && ch == '\n') {
+            *flag = 1;
+    } else {
+        printf("Wrong file name, this file type doesn't exist");
+        *flag = 0;
+    }
+    return *flag;
+}
+
+
+int run() {
+    char first[N][M], second[N][M];
+    int type, flag;
+    start();
+    if (choice(&type, &flag)) {
+        generate(first, N ,M); // generate initial matrix can be deleted
+        input(second, N, M, type);
+        printf("\033[H\033[J");  
+        draw(second, N, M);  // initial draw can be changed
+        game_of_life(flag, first, second, N, M); // game proccess
+    }
+    return 0;
+}
+
+int game_of_life(int flag, char a[N][M], char b[N][M], int n, int m) {
+    char ch;
+    while(flag) {
+        if (stop_or_go(a, b, N , M)) { // checking the condition of the game
+            recoder(b, a, N, M); // owerwrite previous step to the previous one
+            do { // control the input symbol
+                scanf("%c", &ch); // input char
+                while ((getchar() != '\n')) {}
+                if (ch == 'q') {
+                    break;
+                }
+                printf("\033[H\033[J"); // clear window
+                draw(a, N, M);  // just draw what we have until necessary symbol
+            } while (ch != ' ');
+                if (ch == ' ') {
+                    neighbor_change(a, b, N, M); // changing the matrix
+                    printf("\033[H\033[J");
+                    draw(b, N, M);                      
+                } else {
+                    printf("\033[H\033[J");  
+                    printf("stop_game");
+                    flag = 0; // exit from cycle
+                }
+        } else { // if game is stopped
+            printf("\033[H\033[J");  
+            finish();
+            flag = 0; // exit from cycle
+        }
+    }
+    return 1;
+}
+
+
+int start() {
+  template(0, 2);
+  printf(".                                                   ");
+  printf("2021 %% school-21 %% team-64 .\n");
+  printf(".                                                   ");
+  printf(">>>>>>>>>>>>>>>>>>>>>>>>>> .\n");
+  printf(".                                                   ");
+  printf("dzoraida                   .\n");
+  printf(".                                                   ");
+  printf("sfirefly                   .\n");
+  printf(".                                                   ");
+  printf("hrickie                    .\n");
+  template(7, 10);
+  printf(".                             The Game of Life");
+  printf("                                 .\n");
+  template(12, 16);
+  printf(">              Select the initialization option: [1][2][3][4][5]");
+  printf("               <\n");
+  template(16, 22);
+  printf(">  Exit: [q]                                                     ");
+  printf("              <\n");
+  template(23, 25);
+  return 1;
+}
+
+int finish() {
+  template(0, 10);
+  printf(".                                   Game Over!");
+  printf("                                 .\n");
+  template(11, 22);
+  printf(">  Exit: [q]                                                     ");
+  printf("              <\n");
+  template(23, 25);
+  return 1;
+}
+
+int template(int start, int finish) {
+  for (int y = start; y < finish; y++) {
+    for (int x = 0; x < 80; x++) {
+      if (y == 0 || y == 24) {
+        printf("-");
+      } else if (x == 0 || x == 79) {
+        printf(".");
+      } else {
+        printf(" ");
+      }
+    }
+    printf("\n");
+  }
+  return 1;
+}
+
