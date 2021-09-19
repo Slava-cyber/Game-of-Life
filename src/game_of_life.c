@@ -177,8 +177,10 @@ int input(char a[N][M], int n, int m, int type) {
         fp = fopen("r_pentomino.txt", "r");
     } else if (type == 5) {
         fp = fopen("naturmort.txt", "r");
-    } else {
+    } else if (type == 6) {
         fp = fopen("g-over.txt", "r");
+    } else {
+        fp = fopen("cycle.txt", "r");
     }
     if (fp == NULL) {
         puts("Open file error");
@@ -202,7 +204,7 @@ int input(char a[N][M], int n, int m, int type) {
 
 int choice(int *type, int *flag) {
     char ch;
-    if (scanf("%d%c", type, &ch) == 2 && *type >= 1 && *type <=6 && ch == '\n') {
+    if (scanf("%d%c", type, &ch) == 2 && *type >= 1 && *type <=7 && ch == '\n') {
             *flag = 1;
     } else {
         printf("Wrong file name, this file type doesn't exist");
